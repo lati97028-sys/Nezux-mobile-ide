@@ -1,0 +1,164 @@
+/* === TERMINAL CSS === */
+
+.terminal {
+  flex: 1;
+  background: #0a0a10;
+  font-family: var(--font-code);
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 8px 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  color: #c9d1d9;
+}
+
+.terminal-line {
+  display: flex;
+  gap: 8px;
+  padding: 1px 0;
+  word-break: break-all;
+  animation: termLineIn 0.1s ease both;
+}
+
+@keyframes termLineIn {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.term-prompt { color: var(--accent-green); flex-shrink: 0; }
+.term-cmd { color: var(--text-primary); }
+.term-output { color: #8b949e; padding-left: 16px; }
+.term-error { color: var(--accent-red); }
+.term-success { color: var(--accent-green); }
+.term-warn { color: var(--accent-yellow); }
+.term-info { color: var(--accent-blue); }
+.term-path { color: var(--accent-cyan); }
+.term-highlight { color: var(--accent-purple); }
+
+.terminal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  flex-shrink: 0;
+}
+
+.terminal-prompt-label {
+  color: var(--accent-green);
+  font-family: var(--font-code);
+  font-size: 12px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.terminal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-code);
+  font-size: 12px;
+  outline: none;
+  caret-color: var(--accent-blue);
+}
+
+.terminal-input::placeholder { color: var(--text-muted); }
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px; height: 14px;
+  background: var(--accent-blue);
+  animation: cursorBlink 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 1px;
+}
+@keyframes cursorBlink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* Terminal toolbar */
+.terminal-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #0d0d14;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.term-chip {
+  height: 20px;
+  padding: 0 8px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  font-family: var(--font-code);
+  font-size: 10px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+  transition: all var(--t-fast);
+  white-space: nowrap;
+}
+.term-chip:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+.term-chip svg { width: 10px; height: 10px; }
+
+.term-clear-btn {
+  margin-left: auto;
+  height: 20px;
+  padding: 0 8px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-sm);
+  font-family: var(--font-code);
+  font-size: 10px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+  transition: all var(--t-fast);
+}
+.term-clear-btn:hover { color: var(--accent-red); border-color: rgba(248,81,73,0.4); }
+
+/* Console output */
+.console-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+  background: #0a0a10;
+  font-family: var(--font-code);
+  font-size: 12px;
+}
+
+.console-entry {
+  display: flex;
+  gap: 10px;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  animation: termLineIn 0.1s ease both;
+}
+
+.console-level {
+  width: 40px;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding-top: 1px;
+}
+
+.console-level.log { color: var(--text-muted); }
+.console-level.info { color: var(--accent-blue); }
+.console-level.warn { color: var(--accent-yellow); }
+.console-level.error { color: var(--accent-red); }
+
+.console-message {
+  flex: 1;
+  color: var(--text-secondary);
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+.console-source {
+  font-size: 10px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
