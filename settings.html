@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Nezux - Settings</title>
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/layout.css"/>
+  <style>
+    body{overflow-y:auto;overflow-x:hidden}
+    .settings-shell{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+    .settings-nav{height:52px;background:#111118;border-bottom:1px solid #1e1e30;display:flex;align-items:center;padding:0 8px;gap:8px;position:sticky;top:0;z-index:10;flex-shrink:0}
+    .settings-nav h1{font-size:16px;font-weight:800;background:linear-gradient(135deg,#58a6ff,#a371f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1}
+    .settings-body{flex:1;padding:16px;display:flex;flex-direction:column;gap:20px;max-width:480px;width:100%;margin:0 auto}
+    .settings-section{background:#111118;border:1px solid #1e1e30;border-radius:14px;overflow:hidden}
+    .section-title{padding:12px 16px;font-size:11px;font-weight:700;color:#4a4d62;text-transform:uppercase;letter-spacing:1.5px;border-bottom:1px solid #1e1e30;background:#0d0d14}
+    .setting-row{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid #0f0f1a;gap:12px}
+    .setting-row:last-child{border-bottom:none}
+    .setting-label{flex:1;font-size:13px;color:#e2e4f0;font-weight:500}
+    .setting-desc{font-size:11px;color:#4a4d62;margin-top:2px}
+    .setting-control{flex-shrink:0}
+    .setting-row.col{flex-direction:column;align-items:stretch}
+    .setting-row.col .setting-label{margin-bottom:8px}
+    .color-row{display:flex;align-items:center;gap:8px}
+    .color-preview{width:28px;height:28px;border-radius:8px;border:2px solid #2a2a3d;cursor:pointer;flex-shrink:0}
+    input[type=color]{width:0;height:0;opacity:0;position:absolute}
+    .range-wrap{display:flex;align-items:center;gap:10px;width:100%}
+    input[type=range]{flex:1;accent-color:#58a6ff;height:4px}
+    .range-label{font-size:12px;color:#8b8fa8;font-family:monospace;min-width:36px;text-align:right}
+    .storage-status{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:12px;color:#4a4d62;border-top:1px solid #0f0f1a}
+    .storage-dot{width:8px;height:8px;border-radius:50%;background:#4a4d62;flex-shrink:0}
+    .storage-dot.connected{background:#3fb950}
+    .btn-row{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #0f0f1a;flex-wrap:wrap}
+    .connected-files-section{padding:12px 16px;border-top:1px solid #0f0f1a}
+    .connected-files-title{font-size:11px;font-weight:700;color:#4a4d62;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+    #connectedFileList{max-height:160px;overflow-y:auto;background:#0d0d14;border-radius:8px;border:1px solid #1e1e30}
+    .orient-btns{display:flex;gap:8px}
+    .orient-btn{flex:1;padding:10px;border:2px solid #2a2a3d;border-radius:10px;background:#0d0d14;color:#8b8fa8;font-size:12px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .15s}
+    .orient-btn.active,.orient-btn:hover{border-color:#58a6ff;color:#58a6ff;background:rgba(88,166,255,.08)}
+    .orient-icon{width:28px;height:40px;border:2px solid currentColor;border-radius:4px;display:flex;align-items:center;justify-content:center;position:relative}
+    .orient-icon.land{width:40px;height:28px}
+    .orient-icon::after{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5}
+    select.select{width:100%;padding:8px 12px;background:#0d0d14;border:1px solid #2a2a3d;border-radius:8px;color:#e2e4f0;font-size:13px;outline:none;cursor:pointer}
+    .danger-zone .setting-row{border-color:rgba(248,81,73,.08)}
+    .webview-note{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);border-radius:10px;padding:12px 16px;font-size:12px;color:#58a6ff;line-height:1.6}
+  </style>
+</head>
+<body>
+<div class="settings-shell">
+  <div class="settings-nav">
+    <button class="run-btn back nav-btn" id="btnBackToEditor" style="color:#58a6ff;background:transparent;border:none;cursor:pointer;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#58a6ff" stroke-width="2"><polyline points="12,4 7,9 12,14"/></svg>
+    </button>
+    <h1>Settings</h1>
+    <button class="btn btn-primary" id="btnSaveProjectSettings" style="height:32px;padding:0 14px;font-size:12px">Save</button>
+  </div>
+
+  <div class="settings-body">
+
+    <!-- App Info -->
+    <div class="settings-section">
+      <div class="section-title">App Info</div>
+      <div class="setting-row col">
+        <div class="setting-label">App Name</div>
+        <input id="settingAppName" class="input" placeholder="My App"/>
+      </div>
+      <div class="setting-row col">
+        <div class="setting-label">Version</div>
+        <input id="settingVersion" class="input" placeholder="1.0.0"/>
+      </div>
+      <div class="setting-row col">
+        <div class="setting-label">Description</div>
+        <input id="settingDesc" class="input" placeholder="What does this app do?"/>
+      </div>
+    </div>
+
+    <!-- Appearance -->
+    <div class="settings-section">
+      <div class="section-title">Appearance</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Theme Color</div>
+          <div class="setting-desc">PWA / manifest color</div>
+        </div>
+        <div class="color-row setting-control">
+          <div class="color-preview" id="colorPreview" style="background:#58a6ff" onclick="document.getElementById('settingTheme').click()"></div>
+          <input type="color" id="settingTheme" value="#58a6ff"/>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">IDE Theme</div>
+          <div class="setting-desc">Editor color scheme</div>
+        </div>
+        <div class="setting-control">
+          <select class="select" id="settingIDETheme" style="width:120px">
+            <option value="dark">Dark</option>
+            <option value="darker">Darker</option>
+            <option value="amoled">AMOLED</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orientation -->
+    <div class="settings-section">
+      <div class="section-title">Orientation</div>
+      <div class="setting-row">
+        <div class="orient-btns" style="width:100%">
+          <button class="orient-btn active" onclick="setOrientation('portrait',this)">
+            <div class="orient-icon"></div>
+            Portrait
+          </button>
+          <button class="orient-btn" onclick="setOrientation('landscape',this)">
+            <div class="orient-icon land"></div>
+            Landscape
+          </button>
+          <button class="orient-btn" onclick="setOrientation('any',this)">
+            <div class="orient-icon" style="width:32px;height:32px;border-radius:50%"></div>
+            Any
+          </button>
+        </div>
+      </div>
+      <input type="hidden" id="settingOrientation" value="portrait"/>
+    </div>
+
+    <!-- Editor Settings -->
+    <div class="settings-section">
+      <div class="section-title">Editor</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Font Size</div>
+          <div class="setting-desc">Code font size</div>
+        </div>
+        <div class="range-wrap setting-control" style="width:160px">
+          <input type="range" id="settingFontSize" min="10" max="20" value="13" step="1"/>
+          <span class="range-label" id="fontSizeLabel">13px</span>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Word Wrap</div>
+        <label class="toggle setting-control">
+          <input type="checkbox" id="settingWordWrap"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Line Numbers</div>
+        <label class="toggle setting-control">
+          <input type="checkbox" id="settingLineNumbers" checked/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Auto Save</div>
+        <label class="toggle setting-control">
+          <input type="checkbox" id="settingAutoSave" checked/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnSaveEditorSettings">Save Editor Settings</button>
+      </div>
+    </div>
+
+    <!-- Storage Access -->
+    <div class="settings-section">
+      <div class="section-title">Storage Access / Akses Penyimpanan</div>
+      <div class="storage-status">
+        <div class="storage-dot" id="storageDot"></div>
+        <span id="storageStatus">Belum terhubung</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btnConnectFolder" style="gap:6px">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 3h5l2 2h5v7H1z"/></svg>
+          Connect Folder
+        </button>
+        <button class="btn btn-ghost" id="btnImportFile" style="gap:6px">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 9V2M4 5l3-3 3 3M2 11h10"/></svg>
+          Import File
+        </button>
+        <button class="btn btn-ghost" id="btnExportProject" style="gap:6px">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 5v7M4 9l3 3 3-3M2 3h10"/></svg>
+          Export Project
+        </button>
+      </div>
+      <div class="connected-files-section hidden" id="connectedFilesSection">
+        <div class="connected-files-title">Connected Files</div>
+        <div id="connectedFileList"></div>
+      </div>
+      <div style="padding:12px 16px">
+        <div class="webview-note">
+          <strong>Note:</strong> File System Access API digunakan jika browser mendukung. Fallback ke input file biasa. Semua akses memerlukan izin pengguna.
+        </div>
+      </div>
+    </div>
+
+    <!-- PWA Builder -->
+    <div class="settings-section">
+      <div class="section-title">PWA Builder</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Generate manifest.json</div>
+          <div class="setting-desc">Auto-generate from project settings</div>
+        </div>
+        <button class="btn btn-ghost" onclick="downloadManifest()" style="font-size:11px">Generate</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Generate Service Worker</div>
+          <div class="setting-desc">Offline support for your PWA</div>
+        </div>
+        <button class="btn btn-ghost" onclick="downloadSW()" style="font-size:11px">Generate</button>
+      </div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label">Download Full ZIP</div>
+          <div class="setting-desc">All files + manifest + SW</div>
+        </div>
+        <button class="btn btn-primary" onclick="Settings.exportProject()" style="font-size:11px">Download</button>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="settings-section">
+      <div class="section-title">About</div>
+      <div class="setting-row">
+        <div class="setting-label">Nezux IDE</div>
+        <span class="badge badge-blue">v1.0.0</span>
+      </div>
+      <div class="setting-row">
+        <div class="setting-label">Built for Android</div>
+        <span class="badge badge-green">Mobile First</span>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="settings-section danger-zone">
+      <div class="section-title" style="color:var(--accent-red)">Danger Zone</div>
+      <div class="setting-row">
+        <div>
+          <div class="setting-label" style="color:var(--accent-red)">Clear All Data</div>
+          <div class="setting-desc">Delete all projects and files</div>
+        </div>
+        <button class="btn btn-danger" id="btnClearData">Clear</button>
+      </div>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/fileManager.js"></script>
+<script src="js/builder.js"></script>
+<script src="js/settings.js"></script>
+<script>
+  // Color picker sync
+  document.getElementById('settingTheme').addEventListener('input', (e) => {
+    document.getElementById('colorPreview').style.background = e.target.value;
+  });
+
+  function setOrientation(val, btn) {
+    document.querySelectorAll('.orient-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('settingOrientation').value = val;
+  }
+
+  // Restore orientation
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('nezux_orientation') || 'portrait';
+    document.querySelectorAll('.orient-btn').forEach((b,i) => {
+      const vals = ['portrait','landscape','any'];
+      if (vals[i] === saved) b.classList.add('active');
+      else b.classList.remove('active');
+    });
+  });
+
+  async function downloadManifest() {
+    await FileManager.init();
+    const id = FileManager.getCurrentProjectId();
+    const p = await FileManager.getProject(id);
+    if (!p) return alert('No project');
+    const m = FileManager.generateManifest(p);
+    const blob = new Blob([JSON.stringify(m,null,2)],{type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download='manifest.json'; a.click();
+  }
+
+  async function downloadSW() {
+    await FileManager.init();
+    const id = FileManager.getCurrentProjectId();
+    const files = await FileManager.getProjectFiles(id);
+    const sw = FileManager.generateServiceWorker(files);
+    const blob = new Blob([sw],{type:'text/javascript'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download='service-worker.js'; a.click();
+  }
+</script>
+</body>
+</html>

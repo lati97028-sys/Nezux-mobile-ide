@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Nezux - Preview</title>
+  <link rel="stylesheet" href="css/main.css"/>
+  <link rel="stylesheet" href="css/terminal.css"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0d0d14;display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;font-family:'Syne',sans-serif}
+    .run-nav{height:44px;background:#111118;border-bottom:1px solid #1e1e30;display:flex;align-items:center;padding:0 8px;gap:4px;flex-shrink:0}
+    .run-btn{height:32px;min-width:32px;padding:0 8px;border:none;background:transparent;color:#8b8fa8;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s ease;white-space:nowrap}
+    .run-btn:hover{background:#22223a;color:#e2e4f0}
+    .run-btn:active{transform:scale(.95)}
+    .run-btn svg{width:15px;height:15px;flex-shrink:0}
+    .run-btn.back{color:#58a6ff}.run-btn.back:hover{background:rgba(88,166,255,.12)}
+    .run-btn.refresh{color:#3fb950}.run-btn.refresh:hover{background:rgba(63,185,80,.12)}
+    .run-btn.fs{color:#a371f7}.run-btn.fs:hover{background:rgba(163,113,247,.12)}
+    .url-bar{flex:1;background:#0d0d14;border:1px solid #2a2a3d;border-radius:20px;height:28px;display:flex;align-items:center;padding:0 12px;gap:6px;margin:0 4px;overflow:hidden}
+    .url-dot{width:6px;height:6px;border-radius:50%;background:#3fb950;flex-shrink:0}
+    .url-text{font-size:11px;color:#8b8fa8;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+    .preview-area{flex:1;position:relative;overflow:hidden}
+    #previewFrame{width:100%;height:100%;border:none;background:#fff}
+    .dev-panel{position:absolute;bottom:0;left:0;right:0;height:200px;background:#0a0a10;border-top:1px solid #1e1e30;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .3s ease}
+    .dev-panel.visible{transform:translateY(0)}
+    .dev-header{height:32px;display:flex;align-items:center;padding:0 12px;gap:8px;border-bottom:1px solid #1e1e30;flex-shrink:0}
+    .dev-tab{font-size:11px;font-weight:600;color:#4a4d62;cursor:pointer;padding:0 8px;height:100%;display:flex;align-items:center;border-bottom:2px solid transparent}
+    .dev-tab.active{color:#e2e4f0;border-bottom-color:#58a6ff}
+    #consoleOutput{flex:1;overflow-y:auto;padding:8px 12px}
+    .loading-overlay{position:absolute;inset:0;background:#0d0d14;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;z-index:10;transition:opacity .3s ease}
+    .loading-overlay.done{opacity:0;pointer-events:none}
+    .spinner{width:32px;height:32px;border:3px solid #1e1e30;border-top-color:#58a6ff;border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-text{font-size:12px;color:#484f58;letter-spacing:1px}
+    .device-frame{display:none}
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700&display=swap');
+  </style>
+</head>
+<body>
+  <div class="run-nav">
+    <button class="run-btn back" id="btnBack">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="10,4 6,8 10,12"/></svg>
+    </button>
+    <div class="url-bar">
+      <div class="url-dot"></div>
+      <span class="url-text" id="urlText">nezux://preview</span>
+    </div>
+    <button class="run-btn refresh" id="btnRefresh">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 8A5 5 0 103 8"/><polyline points="3,4 3,8 7,8"/></svg>
+    </button>
+    <button class="run-btn" id="btnDevTools" title="DevTools">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="3" width="14" height="10" rx="1"/><line x1="1" y1="7" x2="15" y2="7"/><line x1="5" y1="10" x2="7" y2="10"/></svg>
+    </button>
+    <button class="run-btn fs" id="btnFullscreen">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4"/></svg>
+    </button>
+  </div>
+
+  <div class="preview-area">
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="spinner"></div>
+      <div class="loading-text">Loading preview...</div>
+    </div>
+    <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals" allowfullscreen></iframe>
+    <div class="dev-panel" id="devPanel">
+      <div class="dev-header">
+        <div class="dev-tab active">Console</div>
+        <button onclick="document.getElementById('consoleOutput').innerHTML=''" style="margin-left:auto;background:transparent;border:1px solid #2a2a3d;color:#4a4d62;border-radius:4px;font-size:10px;padding:2px 8px;cursor:pointer">Clear</button>
+        <button onclick="document.getElementById('devPanel').classList.remove('visible')" style="background:transparent;border:none;color:#4a4d62;font-size:18px;cursor:pointer;line-height:1">×</button>
+      </div>
+      <div class="console-output" id="consoleOutput">
+        <div style="padding:8px;font-size:11px;color:#4a4d62;font-family:monospace">Console output will appear here...</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/fileManager.js"></script>
+  <script src="js/runner.js"></script>
+  <script>
+    document.getElementById('previewFrame').addEventListener('load', () => {
+      document.getElementById('loadingOverlay').classList.add('done');
+      const data = JSON.parse(localStorage.getItem('nezux_run_data')||'{}');
+      document.getElementById('urlText').textContent = 'nezux://preview/' + (data.entryFile||'index.html');
+    });
+  </script>
+</body>
+</html>

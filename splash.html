@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>Nezux IDE</title>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="stylesheet" href="css/main.css"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      background:#0d0d14;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      font-family:'JetBrains Mono',monospace;
+      overflow:hidden;
+      position:relative;
+    }
+    .bg-grid{
+      position:absolute;inset:0;
+      background-image:
+        linear-gradient(rgba(88,166,255,0.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(88,166,255,0.04) 1px,transparent 1px);
+      background-size:40px 40px;
+      animation:gridPulse 4s ease-in-out infinite;
+    }
+    @keyframes gridPulse{0%,100%{opacity:.5}50%{opacity:1}}
+    .glow-orb{
+      position:absolute;
+      border-radius:50%;
+      filter:blur(80px);
+      animation:orbFloat 6s ease-in-out infinite;
+    }
+    .orb1{width:300px;height:300px;background:rgba(88,166,255,0.12);top:-80px;left:-80px;animation-delay:0s}
+    .orb2{width:200px;height:200px;background:rgba(163,113,247,0.1);bottom:-50px;right:-50px;animation-delay:-3s}
+    @keyframes orbFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-20px)}}
+    .logo-wrap{
+      position:relative;z-index:1;
+      display:flex;flex-direction:column;align-items:center;gap:24px;
+    }
+    .logo-icon{
+      width:80px;height:80px;
+      background:linear-gradient(135deg,#58a6ff,#a371f7);
+      border-radius:22px;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 0 40px rgba(88,166,255,0.4),0 0 80px rgba(88,166,255,0.15);
+      animation:logoAppear .6s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes logoAppear{from{opacity:0;transform:scale(.5) rotate(-10deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+    .logo-icon svg{width:44px;height:44px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .logo-text{
+      text-align:center;
+      animation:textAppear .6s .2s both;
+    }
+    @keyframes textAppear{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .logo-name{
+      font-size:32px;font-weight:800;letter-spacing:-1px;
+      background:linear-gradient(135deg,#58a6ff,#a371f7);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .logo-tagline{
+      font-size:12px;color:#484f58;letter-spacing:3px;text-transform:uppercase;margin-top:4px;
+    }
+    .progress-wrap{
+      margin-top:40px;
+      display:flex;flex-direction:column;align-items:center;gap:12px;
+      animation:textAppear .6s .4s both;
+    }
+    .progress-bar{
+      width:200px;height:3px;background:#1c2128;border-radius:2px;overflow:hidden;
+    }
+    .progress-fill{
+      height:100%;
+      background:linear-gradient(90deg,#58a6ff,#a371f7);
+      border-radius:2px;
+      width:0%;
+      transition:width .3s ease;
+      box-shadow:0 0 10px rgba(88,166,255,0.5);
+    }
+    .status-text{
+      font-size:11px;color:#484f58;letter-spacing:1px;text-transform:uppercase;
+    }
+    .version-tag{
+      position:absolute;bottom:24px;font-size:11px;color:#2d333b;letter-spacing:1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="glow-orb orb1"></div>
+  <div class="glow-orb orb2"></div>
+
+  <div class="logo-wrap">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24">
+        <polyline points="16 18 22 12 16 6"/>
+        <polyline points="8 6 2 12 8 18"/>
+        <line x1="19" y1="12" x2="5" y2="12" stroke-opacity=".5"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <div class="logo-name">Nezux</div>
+      <div class="logo-tagline">Mobile IDE</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="status-text" id="statusText">Initializing...</div>
+    </div>
+  </div>
+
+  <div class="version-tag">v1.0.0</div>
+
+  <script>
+    const steps=[
+      {p:20,t:'Loading modules...'},
+      {p:45,t:'Setting up workspace...'},
+      {p:70,t:'Preparing file system...'},
+      {p:90,t:'Almost ready...'},
+      {p:100,t:'Welcome to Nezux!'}
+    ];
+    let i=0;
+    const fill=document.getElementById('progressFill');
+    const status=document.getElementById('statusText');
+    function next(){
+      if(i>=steps.length){
+        setTimeout(()=>{window.location.href='editor.html'},300);
+        return;
+      }
+      const s=steps[i++];
+      fill.style.width=s.p+'%';
+      status.textContent=s.t;
+      setTimeout(next,400+Math.random()*200);
+    }
+    setTimeout(next,300);
+  </script>
+</body>
+</html>
